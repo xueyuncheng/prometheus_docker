@@ -1,0 +1,24 @@
+groups:
+  - name: 系统报警规则组
+    rules:
+      - alert: "CPU使用率高"
+        expr: > 
+          (((count(count(node_cpu_seconds_total{}) by (cpu))) - 
+          avg(sum by (mode)(rate(node_cpu_seconds_total{mode='idle'}[5m])))) * 100) / 
+          count(count(node_cpu_seconds_total{}) by (cpu)) > 80
+        for: 1m
+        labels:
+          serverity: 警告
+        annotations:
+          summary: "CPU使用率高，实例 = {{ $labels.instance }}"
+          description: "CPU使用率高，标签 = {{ $labels }}, 值 = {{ $value }}."
+
+      - alert: "RAM使用率高"
+        expr: > 
+          100 - ((node_memory_MemAvailable_bytes{} * 100) / node_memory_MemTotal_bytes{}) > 80
+        for: 1m
+        labels:
+          serverity: 警告
+        annotations:
+          summary: "RAM使用率高，实例 = {{ $labels.instance }}"
+          description: "RAM使用率高，标签 = {{ $labels }}, 值 = {{ $value }}."

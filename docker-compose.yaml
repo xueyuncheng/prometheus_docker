@@ -6,28 +6,39 @@ services:
     volumes:
       - "./prometheus/prometheus.yaml:/opt/bitnami/prometheus/conf/prometheus.yml"
       - "./prometheus/mysqld_rules.yaml:/opt/bitnami/prometheus/conf/mysqld_rules.yaml"
+      - "./prometheus/node_rules.yaml:/opt/bitnami/prometheus/conf/node_rules.yaml"
       - "prometheus_data:/opt/bitnami/prometheus/data"
     ports:
       - "10000:9090"
-  
+
   alertmanager:
     image: bitnami/alertmanager
     volumes:
       - "./alertmanager/alertmanager.yaml:/opt/bitnami/alertmanager/conf/config.yml"
     ports:
       - "10001:9093"
-  
+
   grafana:
     image: bitnami/grafana
     volumes:
       - "grafana_data:/opt/bitnami/grafana/data"
     ports:
       - "10002:3000"
-  
+
   mysqld_exporter:
     image: bitnami/mysqld-exporter
     environment:
-      - DATA_SOURCE_NAME=root:Qweasd123@(192.168.251.60:3306)/
+      - DATA_SOURCE_NAME=root:xxxx@(192.168.251.60:3306)/
+
+  node_exporter:
+    image: bitnami/node-exporter
+    command:
+      - "--path.rootfs=/host"
+    network_mode: host
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - "/:/host:ro,rslave"
 
 volumes:
   prometheus_data:
