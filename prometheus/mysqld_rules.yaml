@@ -1,0 +1,24 @@
+groups:
+  - name: "mysql报警规则组"
+    rules:
+      - alert: "mysql连接数较多"
+        expr: >
+          max(max_over_time(mysql_global_status_threads_connected{}[1m])  or 
+          mysql_global_status_threads_connected{} ) by (instance) > 10
+        for: 1m
+        labels:
+          serverity: 警告
+        annotations:
+          summary: "mysql连接数较多, 实例 = {{ $labels.instance }}"          
+          description: "mysql连接数较多, 标签 = {{ $labels }}, 值 = {{ $value }}."
+      
+      - alert: "mysql查询数较高"
+        expr: >
+          (rate(mysql_global_status_queries{}[5m]) or irate(mysql_global_status_queries{}[5m])) > 10
+        for: 1m
+        labels:
+          serverity: 警告
+        annotations:
+          summary: "mysql连接数较多, 实例 = {{ $labels.instance }}"          
+          description: "mysql连接数较多, 标签 = {{ $labels }}, 值 = {{ $value }}."
+    
