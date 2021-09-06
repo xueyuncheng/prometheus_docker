@@ -2,10 +2,10 @@ groups:
   - name: 系统报警规则组
     rules:
       - alert: "CPU使用率高"
-        expr: > 
+        expr: >
           (((count(count(node_cpu_seconds_total{}) by (cpu))) - 
-          avg(sum by (mode)(rate(node_cpu_seconds_total{mode='idle'}[5m])))) * 100) / 
-          count(count(node_cpu_seconds_total{}) by (cpu)) > 80
+            avg(sum by (mode)(rate(node_cpu_seconds_total{mode='idle'}[5m])))) * 100) / 
+            count(count(node_cpu_seconds_total{}) by (cpu)) > 80
         for: 1m
         labels:
           serverity: 警告
@@ -14,7 +14,7 @@ groups:
           description: "CPU使用率高，标签 = {{ $labels }}, 值 = {{ $value }}."
 
       - alert: "RAM使用率高"
-        expr: > 
+        expr: >
           100 - ((node_memory_MemAvailable_bytes{} * 100) / node_memory_MemTotal_bytes{}) > 80
         for: 1m
         labels:
@@ -22,3 +22,14 @@ groups:
         annotations:
           summary: "RAM使用率高，实例 = {{ $labels.instance }}"
           description: "RAM使用率高，标签 = {{ $labels }}, 值 = {{ $value }}."
+
+      - alert: "磁盘使用率高"
+        expr: >
+          100 - ((node_filesystem_avail_bytes{device!~'rootfs'} * 100) / 
+            node_filesystem_size_bytes{device!~'rootfs'}) > 80
+        for: 1m
+        labels:
+          serverity: 警告
+        annotations:
+          summary: "磁盘使用率高，实例 = {{ $labels.instance }}"
+          description: "磁盘使用率高，标签 = {{ $labels }}, 值 = {{ $value }}."
